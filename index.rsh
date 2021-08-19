@@ -13,7 +13,7 @@ export const main = Reach.App(() => {
   const Bob   = Participant('Bob', {
     ...Player,
   });
-  const LCT = View('LCT', {
+  const vLCT = View('LCT', {
     lct: UInt });
   deploy();
   
@@ -36,7 +36,7 @@ export const main = Reach.App(() => {
     }
   ),
     (_) => {
-      LCT.lct.set(lastCT);
+      vLCT.lct.set(lastCT);
       Alice.only(()=>{
           interact.show(index);}
       );
@@ -51,7 +51,7 @@ export const main = Reach.App(() => {
     }
   ),
     (newMsg) => {
-      LCT.lct.set(lastCT);
+      //vLCT.lct.set(lastCT);
       each([Alice], () => {
         interact.show(newMsg); });
       return [ index+1, newMsg, lastConsensusTime(),false ]; })
