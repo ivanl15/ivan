@@ -62,18 +62,28 @@ const stdlib = loadStdlib(process.env);
   interact.getwords = async (now) => {
     const msg = await ask(`What do you want to say?`, (x) => {
       const word = x;
+      console.log(`You've said ${word}`);
       return now+word;
     });
-    console.log(`You've said ${msg}`);
     return msg;
+  };
+
+  interact.check = async (t) => {
+    console.log(`${t}`);
+    const tnew = await ctc.getViews().LCT.lct();
+    console.log(`${tnew[1]}`);
+    //return t == tnew ? true : false;
+    return true;
   };
 
   
   interact.show = async (msg) => {
     console.log(`The dialog is: ${msg}`);
+    //const tnew = await ctc.getViews().LCT.lct();
+    //console.log(`${tnew}`);
   };
 
-  const part = isAlice ? backend.Alice : backend.Bob;
+  const part = backend.Alice;
   await part(ctc, interact);
 
   const after = await getBalance();
