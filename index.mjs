@@ -71,7 +71,7 @@ const stdlib = loadStdlib(process.env);
   interact.check = async (t) => {
     console.log(`${t}`);
     const tnew = await ctc.getViews().LCT.lct();
-    console.log(`${tnew[1]}`);
+    console.log(`${tnew}`);
     //return t == tnew ? true : false;
     return true;
   };
