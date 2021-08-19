@@ -3,47 +3,62 @@
 const Player = {
   getwords: Fun([UInt], UInt),
   show: Fun([UInt], Null),
+  check: Fun([UInt], Bool)
 };
 
 export const main = Reach.App(() => {
-  const Alice = Participant('Alice', {
+  const Alice = ParticipantClass('Alice', {
     ...Player,
   });
   const Bob   = Participant('Bob', {
     ...Player,
   });
+  const LCT = View('LCT', {
+    lct: UInt });
   deploy();
-  Bob.only(() => {
-    const original2 = 0; });
-
-  Bob.publish(original2);
-  commit();
+  
   Alice.only(() => {
     const original1 = 0; });
 
 
   Alice.publish(original1);
+  const CT = lastConsensusTime();
 
-
-
-  const [ index, dialog ] =
-  parallelReduce([original1, original1])
+  const [ index, dialog, lastCT, isfirst ] =
+  parallelReduce([original1, original1, CT, true])
   .invariant(balance() == 0)
   .while(index < 10)
-  .case(Alice, (() => ({
+  .case(Alice, (
+    () => {
+    return ({
+        when: isfirst
+     })
+    }
+  ),
+    (_) => {
+      LCT.lct.set(lastCT);
+      Alice.only(()=>{
+          interact.show(index);}
+      );
+      return [ index, dialog, lastConsensusTime(),false ]; })
+  .case(Alice, (
+    () => {
+    const t = lastConsensusTime();
+    return ({
+        when: declassify(interact.check(t)),
         msg: declassify(interact.getwords(dialog))
-     })),
+     })
+    }
+  ),
     (newMsg) => {
-      each([Alice, Bob], () => {
+      LCT.lct.set(lastCT);
+      each([Alice], () => {
         interact.show(newMsg); });
-      return [ index+1, newMsg ]; })
-   .case(Bob, (() => ({
-        msg: declassify(interact.getwords(dialog))
-     })),
-    (newMsg) => {
-      each([Alice, Bob], () => {
-        interact.show(newMsg); });
-      return [ index+1, newMsg ]; });
+      return [ index+1, newMsg, lastConsensusTime(),false ]; })
+    
+.timeout(10000,()=>{
+        Anybody.publish();
+        return [ index, dialog, lastConsensusTime(), isfirst ];});
 
     commit()
 
